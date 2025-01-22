@@ -1,30 +1,19 @@
+################ Data cleaning the Iris dataset #################
+from sklearn import datasets
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-# Load your dataset (replace 'path_to_file.csv' with the actual file path)
-file_path = 'iris/iris.data' 
-data = pd.read_csv(file_path, header=None)
+# load iris dataset
+iris = datasets.load_iris()
+# Since this is a bunch, create a dataframe
+iris_df=pd.DataFrame(iris.data)
+iris_df['class']=iris.target
 
-# Assign appropriate column names
-column_names = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'species']
-data.columns = column_names
+iris_df.columns=['sepal_len', 'sepal_wid', 'petal_len', 'petal_wid', 'class']
+#### ===> TASK 1: here - add two more lines of the code to find the number and mean of missing data
+cleaned_data = iris_df.dropna(how="all", inplace=True) # remove any empty lines
 
-# Data cleaning: Check for and remove missing values
-cleaned_data = data.dropna()
 
-# Convert numerical columns to float
-for col in cleaned_data.columns[:-1]:  # Exclude 'species'
-    cleaned_data[col] = pd.to_numeric(cleaned_data[col], errors='coerce')
+iris_X=iris_df.iloc[:5,[0,1,2,3]]
+print(iris_X)
 
-# Display the first 5 rows of the cleaned dataset
-print("Top 5 Data:\n\n",cleaned_data.head())
-
-# Calculate the correlation matrix for numerical columns
-correlation_matrix = data.iloc[:, :-1].corr()
-
-# Create a heatmap
-plt.figure(figsize=(8, 6))
-sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", square=True)
-plt.title("Correlation Heatmap")
-plt.show()
+### TASK2: Here - Write a short readme to explain above code and how we can calculate the corrolation amoung featuers with description
