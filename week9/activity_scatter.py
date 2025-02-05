@@ -9,9 +9,12 @@ plt.figure(figsize=(5, 5))
 plt.scatter(study_hours, test_scores, color='purple', marker='*')
 plt.xlabel("Study Hours")
 plt.ylabel("Test Scores")
-plt.title("Study Hours vs Test Scores")
+plt.title("Trend: Study Hours vs Test Scores")
 plt.grid(True)
 
 # Save
 plt.savefig("week9/study_hours_vs_test_scores.png")
 plt.show()
+
+# Q: What trend do you observe?
+# A: According to the scatter plot trend, there is a favorable link between study hours and test scores.
