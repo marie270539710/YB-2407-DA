@@ -12,6 +12,6 @@ plt.pie(sizes, labels=labels, autopct='%1.1f%%', colors=colors, explode=explode,
 plt.title("Favorite Fruits of 100 Students\n")
 
 # Save the pie chart
-plt.savefig("favorite_fruits_pie_chart.png")
+plt.savefig("week9/favorite_fruits_pie_chart.png")
 
 plt.show()
