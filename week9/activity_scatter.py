@@ -17,4 +17,6 @@ plt.savefig("week9/study_hours_vs_test_scores.png")
 plt.show()
 
 # Q: What trend do you observe?
-# A: According to the scatter plot trend, there is a favorable link between study hours and test scores.
+# A: 
+# According to the scatter plot trend, there is a favorable link between study hours and test scores. 
+# The more time students invested in studying, the better their results.
