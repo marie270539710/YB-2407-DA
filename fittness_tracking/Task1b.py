@@ -41,11 +41,13 @@ mse = mean_squared_error(y_test, y_pred)
 rmse = np.sqrt(mse)
 r2 = r2_score(y_test, y_pred)
 
+print("-" * 120)
 print("Model Coefficients:", model.coef_)
 print("Intercept:", model.intercept_)
 print("Mean Squared Error (MSE):", mse)
 print("Root Mean Squared Error (RMSE):", rmse)
 print("R-squared (R²):", r2)
+print("-" * 120)
 
 # Visualize the actual vs. predicted App Sessions
 plt.figure(figsize=(8, 6))
