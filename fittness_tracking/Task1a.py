@@ -13,6 +13,9 @@ from sklearn.metrics import r2_score, mean_absolute_error
 # Load dataset
 df = pd.read_csv("/Users/marie/Documents/GitHub/YB-2407-DA/fittness_tracking/dataset.csv")
 
+# Remove the 'User ID' column
+df = df.drop('User ID', axis=1)
+
 # Peek at dataset
 print("-" * 120)
 print("First 5 rows:")
@@ -90,6 +93,30 @@ plt.show()
 ############### Exploratory Data Analysis (EDA) ###############
 ###############################################################
 
+# Define a list of colors to use for each histogram
+colors = ['blue', 'green', 'red', 'purple', 'orange', 'brown', 'pink', 'gray', 'olive', 'cyan']
+# Determine the number of subplots needed
+num_cols = len(numeric_columns)
+ncols = 2  # you can adjust the number of columns in the grid
+nrows = int(np.ceil(num_cols / ncols))
+
+# Create a single figure with subplots
+fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(14, 6 * nrows))
+axes = axes.flatten()  # flatten the array for easy iteration
+
+# Plot a histogram for each numeric column on a separate subplot
+for i, col in enumerate(numeric_columns):
+    sns.histplot(df[col], kde=True, bins=30, ax=axes[i], color=colors[i % len(colors)])
+    axes[i].set_title(f"'{col}'")
+    axes[i].set_xlabel(col)
+    axes[i].set_ylabel("Frequency")
+
+# If there are any unused subplots, hide them
+for j in range(i + 1, len(axes)):
+    axes[j].axis('off')
+
+plt.tight_layout()
+plt.show()
 
 # Convert columns to 'category' type
 df["Gender"] = df["Gender"].astype("category")
@@ -104,12 +131,19 @@ df["Location"] = df["Location"].cat.codes        # Rural=0, Suburban=1, Urban=2 
 # Compute correlation matrix
 corr_matrix = df.corr()
 
-# Plot the correlation matrix
+# Plot the correlation matrix Matplotlib
 plt.figure(figsize=(10, 8))
 plt.imshow(corr_matrix, cmap='viridis', interpolation='none')
 plt.colorbar()
 plt.title('Fitness Tracking: Correlation Matrix')
 plt.xticks(np.arange(len(corr_matrix.columns)), corr_matrix.columns, rotation=90)
 plt.yticks(np.arange(len(corr_matrix.columns)), corr_matrix.columns)
+plt.tight_layout()
+plt.show()
+
+# Create the heatmap
+plt.figure(figsize=(10, 8))
+sns.heatmap(corr_matrix, annot=True, cmap='viridis', fmt=".2f", linewidths=0.5)
+plt.title("Correlation Matrix Heatmap")
 plt.tight_layout()
 plt.show()

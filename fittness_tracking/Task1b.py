@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
@@ -12,9 +13,13 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 # Load the dataset
 df = pd.read_csv('/Users/marie/Documents/GitHub/YB-2407-DA/fittness_tracking/dataset.csv')
+
+# Remove the 'User ID' column
+df = df.drop('User ID', axis=1)
 
 # Convert categorical columns to 'category' type and then encode them
 df["Gender"] = df["Gender"].astype("category")
@@ -100,13 +105,23 @@ log_reg.fit(X_train, y_train)
 
 # Predict on the test set
 y_pred_log = log_reg.predict(X_test)
+cm_log = confusion_matrix(y_test, y_pred_log)
 
 # Evaluate the model
 print("-" * 120)
 print("Logistic Regression Results")
 print("Accuracy:", accuracy_score(y_test, y_pred_log))
-print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_log))
+print("Confusion Matrix:\n", cm_log)
 print("Classification Report:\n", classification_report(y_test, y_pred_log))
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(cm_log, annot=True, fmt="d", cmap="Blues",
+            xticklabels=["Low Engagement", "High Engagement"],
+            yticklabels=["Low Engagement", "High Engagement"])
+plt.xlabel("Predicted Label")
+plt.ylabel("Actual Label")
+plt.title("Confusion Matrix for Logistic Regression")
+plt.show()
 
 # Initialize and train the Random Forest model
 rf = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -114,12 +129,22 @@ rf.fit(X_train, y_train)
 
 # Predict on the test set
 y_pred_rf = rf.predict(X_test)
+cm_rf = confusion_matrix(y_test, y_pred_rf)
+
+plt.figure(figsize=(6, 4))
+sns.heatmap(cm_rf, annot=True, fmt="d", cmap="Greens",
+            xticklabels=["Low Engagement", "High Engagement"],
+            yticklabels=["Low Engagement", "High Engagement"])
+plt.xlabel("Predicted Label")
+plt.ylabel("Actual Label")
+plt.title("Confusion Matrix for Random Forest")
+plt.show()
 
 # Evaluate the model
 print("-" * 120)
 print("Random Forest Results")
 print("Accuracy:", accuracy_score(y_test, y_pred_rf))
-print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_rf))
+print("Confusion Matrix:\n", cm_rf)
 print("Classification Report:\n", classification_report(y_test, y_pred_rf))
 print("-" * 120)
 
@@ -127,20 +152,6 @@ print("-" * 120)
 ###############        Clustering Models        ###############
 ###############################################################
 
-# Define the features to be used in clustering
-features = [
-    "Age",
-    "Gender_Code",
-    "Activity_Code",
-    "Location_Code",
-    "App Sessions",
-    "Distance Travelled (km)",
-    "Calories Burned"
-]
-X = df[features]
-
-# Optional: Scale the features for better clustering performance
-from sklearn.preprocessing import StandardScaler
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
@@ -171,18 +182,7 @@ df["KMeans_Cluster"] = kmeans_model.labels_
 # Calculate the silhouette score for the chosen k
 score = silhouette_score(X_scaled, kmeans_model.labels_)
 print(f"Silhouette Score for k=3: {score:.3f}")
-
-# Create an Agglomerative Clustering model
-hc_model = AgglomerativeClustering(n_clusters=3)
-hc_labels = hc_model.fit_predict(X_scaled)
-
-# Assign cluster labels to each record
-df["HC_Cluster"] = hc_labels
-
-# (Optional) Evaluate with Silhouette Score
-hc_silhouette = silhouette_score(X_scaled, hc_labels)
-print(f"Hierarchical Clustering Silhouette Score for k=3: {hc_silhouette:.3f}")
-
+print("-" * 120)
 cluster_summary = df.groupby("KMeans_Cluster")[features].mean()
 print(cluster_summary)
 print("-" * 120)
