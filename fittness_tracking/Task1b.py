@@ -8,6 +8,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+from sklearn.cluster import AgglomerativeClustering
+from sklearn.decomposition import PCA
 
 # Load the dataset
 df = pd.read_csv('/Users/marie/Documents/GitHub/YB-2407-DA/fittness_tracking/dataset.csv')
@@ -118,3 +122,78 @@ print("Accuracy:", accuracy_score(y_test, y_pred_rf))
 print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_rf))
 print("Classification Report:\n", classification_report(y_test, y_pred_rf))
 print("-" * 120)
+
+###############################################################
+###############        Clustering Models        ###############
+###############################################################
+
+# Define the features to be used in clustering
+features = [
+    "Age",
+    "Gender_Code",
+    "Activity_Code",
+    "Location_Code",
+    "App Sessions",
+    "Distance Travelled (km)",
+    "Calories Burned"
+]
+X = df[features]
+
+# Optional: Scale the features for better clustering performance
+from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Determine an optimal number of clusters (Elbow Method)
+inertia_values = []
+cluster_range = range(2, 10)  # testing 2 to 9 clusters
+
+for k in cluster_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_scaled)
+    inertia_values.append(kmeans.inertia_)
+
+# Plot the elbow curve
+plt.figure(figsize=(8, 5))
+plt.plot(cluster_range, inertia_values, marker='o')
+plt.title("Elbow Method for Optimal k")
+plt.xlabel("Number of Clusters (k)")
+plt.ylabel("Inertia (Sum of Squared Distances)")
+plt.show()
+
+# Choose a k based on the elbow plot, e.g., k=3
+kmeans_model = KMeans(n_clusters=3, random_state=42)
+kmeans_model.fit(X_scaled)
+
+# Assign cluster labels to each record
+df["KMeans_Cluster"] = kmeans_model.labels_
+
+# Calculate the silhouette score for the chosen k
+score = silhouette_score(X_scaled, kmeans_model.labels_)
+print(f"Silhouette Score for k=3: {score:.3f}")
+
+# Create an Agglomerative Clustering model
+hc_model = AgglomerativeClustering(n_clusters=3)
+hc_labels = hc_model.fit_predict(X_scaled)
+
+# Assign cluster labels to each record
+df["HC_Cluster"] = hc_labels
+
+# (Optional) Evaluate with Silhouette Score
+hc_silhouette = silhouette_score(X_scaled, hc_labels)
+print(f"Hierarchical Clustering Silhouette Score for k=3: {hc_silhouette:.3f}")
+
+cluster_summary = df.groupby("KMeans_Cluster")[features].mean()
+print(cluster_summary)
+print("-" * 120)
+
+pca = PCA(n_components=2)
+pca_result = pca.fit_transform(X_scaled)
+
+plt.figure(figsize=(8,6))
+plt.scatter(pca_result[:,0], pca_result[:,1], c=df["KMeans_Cluster"], cmap="viridis")
+plt.title("K-Means Clusters (PCA-reduced data)")
+plt.xlabel("PC 1")
+plt.ylabel("PC 2")
+plt.colorbar(label="Cluster")
+plt.show()
