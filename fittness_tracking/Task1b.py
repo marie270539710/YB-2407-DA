@@ -11,7 +11,6 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from sklearn.cluster import AgglomerativeClustering
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
@@ -42,8 +41,8 @@ features = ["Age", "Gender_Code", "Activity_Code", "Location_Code",
             "Distance Travelled (km)", "Calories Burned"]
 target = "App Sessions"
 
-X = df[features]
-y = df[target]
+X = df[features] # Independent Variable
+y = df[target] # Dependent Variable
 
 # Split the data into training and testing sets (80% train, 20% test)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -186,6 +185,24 @@ print("-" * 120)
 cluster_summary = df.groupby("KMeans_Cluster")[features].mean()
 print(cluster_summary)
 print("-" * 120)
+
+# No PCA 
+# Plot the first two columns of X_scaled (assumed to be your feature matrix)
+plt.figure(figsize=(8,6))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], c=df["KMeans_Cluster"], cmap="viridis")
+plt.title("K-Means Clusters (Using First Two Scaled Features)")
+plt.xlabel("Scaled Feature 1")
+plt.ylabel("Scaled Feature 2")
+plt.colorbar(label="Cluster")
+plt.show()
+
+plt.figure(figsize=(8,6))
+plt.scatter(df["App Sessions"], df["Distance Travelled (km)"], c=df["KMeans_Cluster"], cmap="viridis")
+plt.title("K-Means Clusters (App Sessions vs. Distance Travelled)")
+plt.xlabel("App Sessions")
+plt.ylabel("Distance Travelled (km)")
+plt.colorbar(label="Cluster")
+plt.show()
 
 pca = PCA(n_components=2)
 pca_result = pca.fit_transform(X_scaled)
